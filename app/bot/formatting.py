@@ -134,22 +134,25 @@ def format_rate_summary(player: dict, analytics: dict) -> str:
     return "\n".join(lines)
 
 
-def format_brawlers_list(player: dict, limit: int = 15) -> str:
+def _power_badge(power: int) -> str:
+
+    return "⭐" if power >= 11 else f"Lvl{power}"
+
+
+def format_brawlers_list(player: dict) -> str:
     brawlers = player.get("brawlers", [])
     if not brawlers:
         return f"No brawler data found for {escape(player.get('name', 'this player'))} yet."
     name = escape(player.get("name", "?"))
-    lines = [f"🧬 <b>{name}</b>'s top brawlers:"]
-    for b in brawlers[:limit]:
-        lines.append(f"🏆 {b['trophies']:,}  {escape(b['name'])}  (power {b['power']})")
-    if len(brawlers) > limit:
-        lines.append(f"...and {len(brawlers) - limit} more")
+    lines = [f"<b>{name}</b>'s brawlers ({len(brawlers)}) ;p"]
+    for b in brawlers:
+        lines.append(f"🏆 {b['trophies']:,}  {escape(b['name'])}  {_power_badge(b.get('power'))}")
     return "\n".join(lines)
 
 
 def format_leaderboard_list(country_code: str, players: list[dict], limit: int = 10) -> str:
     if not players:
-        return f"No leaderboard data collected yet for '{escape(country_code)}' .Maybe try again later :)"
+        return f"No leaderboard data collected yet for '{escape(country_code)}'. Maybe try again later :)"
     lines = [f"🌍 <b>Top {min(limit, len(players))} - {escape(country_code)}</b>"]
     for p in players[:limit]:
         lines.append(f"#{p['rank']}  {escape(p['name'])}  🏆 {p['trophies']:,}")
